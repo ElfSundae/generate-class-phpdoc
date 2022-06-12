@@ -49,15 +49,15 @@ class Foo
 
 echo GenerateFacadePhpdocs::for(Foo::class);
 
+echo GenerateFacadePhpdocs::for(Foo::class)
+    ->filter(null);
+
 echo GenerateFacadePhpdocs::for(new Foo)
     ->exclude('__construct')
-    ->filter(function (ReflectionMethod $method) {
-        return strpos($method->getName(), '__') !== 0;
-    })
-    ->see([Foo::class, GenerateFacadePhpdocs::class])
-    ->generate();
+    ->see([Foo::class, GenerateFacadePhpdocs::class]);
 
 echo GenerateFacadePhpdocs::for(GenerateFacadePhpdocs::class)
+    ->filter(null)
     ->methodModifiers(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED)
     ->add('void addMethod1($param = [])')
     ->add('array addMethod2($a, $b = null)')

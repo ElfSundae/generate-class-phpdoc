@@ -9,9 +9,9 @@ use ReflectionType;
 
 class GenerateFacadePhpdocs
 {
-    protected array $reflections = [];
+    protected $reflections = [];
 
-    protected int $methodModifiers = ReflectionMethod::IS_PUBLIC;
+    protected $methodModifiers = ReflectionMethod::IS_PUBLIC;
     protected $excluded = [];
     protected $filter;
     protected $add = [];
@@ -33,6 +33,8 @@ class GenerateFacadePhpdocs
             $reflection = new ReflectionClass($class);
             $this->reflections[$reflection->getName()] = $reflection;
         }
+
+        $this->filter = static::defaultFilter();
     }
 
     /**
@@ -76,12 +78,12 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Set the method filter callback.
+     * Set the method filter callback. Defaults to `GenerateFacadePhpdocs::defaultFilter()`.
      *
-     * @param (callable(ReflectionMethod): bool) $filter
+     * @param (callable(ReflectionMethod): bool)|null $filter
      * @return $this
      */
-    public function filter(callable $filter): static
+    public function filter(?callable $filter): static
     {
         $this->filter = $filter;
 
@@ -89,7 +91,19 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Add a method doc.
+     * The default filter that excludes methods which name has a '__' prefix.
+     *
+     * @return callable
+     */
+    public static function defaultFilter(): callable
+    {
+        return static function (ReflectionMethod $method) {
+            return strpos($method->getName(), '__') !== 0;
+        };
+    }
+
+    /**
+     * Add a method PHPDoc comment.
      *
      * @param string $doc
      * @return $this
@@ -115,7 +129,7 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Generates facade PHPDocs.
+     * Generates the facade PHPDocs.
      *
      * @return string
      */
@@ -138,7 +152,7 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Generates facade PHPDocs.
+     * Generates the facade PHPDocs.
      *
      * @return string
      */
@@ -148,7 +162,7 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Return methods docs array.
+     * Return methods PHPDocs as an array.
      *
      * @return array
      */
