@@ -1,2 +1,3 @@
-# generate-class-phpdoc
-Generate PHPDoc comments for a PHP class.
+# Laravel Facade Phpdocs Generator
+
+Generate PHPDoc comments for Laravel facade classes.
