@@ -213,10 +213,10 @@ class GenerateFacadePhpdoc
 
     protected function getParameters(ReflectionMethod $method): string
     {
-        $parameters = array_map(function (ReflectionParameter $parameter) {
+        $parameters = array_map(function (ReflectionParameter $parameter) use ($method) {
             return $this->getType($parameter->getType())
                 .$this->getParameterName($parameter)
-                .$this->getParameterDefaultValue($parameter);
+                .$this->getParameterDefaultValue($method, $parameter);
         }, $method->getParameters());
 
         return '('.implode(', ', $parameters).')';
@@ -235,7 +235,7 @@ class GenerateFacadePhpdoc
         return $name;
     }
 
-    protected function getParameterDefaultValue(ReflectionParameter $parameter): string
+    protected function getParameterDefaultValue(ReflectionMethod $method, ReflectionParameter $parameter): string
     {
         if (! $parameter->isDefaultValueAvailable()) {
             return '';
@@ -246,6 +246,7 @@ class GenerateFacadePhpdoc
 
         if ($parameter->isDefaultValueConstant()) {
             $export = $parameter->getDefaultValueConstantName();
+            $export = str_replace('self::', '\\'.$method->class.'::', $export);
         } elseif (is_null($value)) {
             $export = 'null'; // NULL -> null
         } elseif (is_array($value)) {
