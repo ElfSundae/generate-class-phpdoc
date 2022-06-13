@@ -177,7 +177,7 @@ class GenerateFacadePhpdoc
                 if ($this->filter && ! call_user_func($this->filter, $method)) {
                     continue;
                 }
-                $docs[] = $this->getType($method->getReturnType(), true)
+                $docs[] = $this->getReturnType($method)
                     .$method->getName()
                     .$this->getParameters($method);
             }
@@ -188,10 +188,17 @@ class GenerateFacadePhpdoc
         return $docs;
     }
 
-    protected function getType(?ReflectionType $type, $isReturnType = false): string
+    protected function getReturnType(ReflectionMethod $method): string
+    {
+        $type = $method->getReturnType();
+
+        return $this->processType($type);
+    }
+
+    protected function processType(?ReflectionType $type): string
     {
         if (is_null($type)) {
-            return $isReturnType ? 'void ' : '';
+            return '';
         }
 
         $type = (string) $type;
@@ -214,12 +221,17 @@ class GenerateFacadePhpdoc
     protected function getParameters(ReflectionMethod $method): string
     {
         $parameters = array_map(function (ReflectionParameter $parameter) use ($method) {
-            return $this->getType($parameter->getType())
+            return $this->getParameterType($parameter)
                 .$this->getParameterName($parameter)
                 .$this->getParameterDefaultValue($method, $parameter);
         }, $method->getParameters());
 
         return '('.implode(', ', $parameters).')';
+    }
+
+    protected function getParameterType(ReflectionParameter $parameter): string
+    {
+        return $this->processType($parameter->getType());
     }
 
     protected function getParameterName(ReflectionParameter $parameter): string
