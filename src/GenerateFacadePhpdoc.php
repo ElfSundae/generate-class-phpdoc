@@ -7,11 +7,11 @@ use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionType;
 
-class GenerateFacadePhpdocs
+class GenerateFacadePhpdoc
 {
     protected $reflections = [];
 
-    protected $methodModifiers = ReflectionMethod::IS_PUBLIC;
+    protected $modifier = ReflectionMethod::IS_PUBLIC;
     protected $excluded = [];
     protected $filter;
     protected $add = [];
@@ -51,15 +51,15 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Set the method modifiers to filter the PHPDocs to include only methods
+     * Set the method modifier to filter the PHPDocs to include only methods
      * with certain attributes. Defaults to ReflectionMethod::IS_PUBLIC.
      *
-     * @param int $modifiers Bitwise of ReflectionMethod modifiers.
+     * @param int $modifier Bitwise of ReflectionMethod modifiers.
      * @return $this
      */
-    public function methodModifiers(int $modifiers): static
+    public function modifier(int $modifier): static
     {
-        $this->methodModifiers = $modifiers;
+        $this->modifier = $modifier;
 
         return $this;
     }
@@ -67,18 +67,18 @@ class GenerateFacadePhpdocs
     /**
      * Exclude some methods by names.
      *
-     * @param string|array $methodNames
+     * @param string|array $names
      * @return $this
      */
-    public function exclude(string|array $methodNames): static
+    public function exclude(string|array $names): static
     {
-        $this->excluded = array_merge($this->excluded, (array) $methodNames);
+        $this->excluded = array_merge($this->excluded, (array) $names);
 
         return $this;
     }
 
     /**
-     * Set the method filter callback. Defaults to `GenerateFacadePhpdocs::defaultFilter()`.
+     * Set the method filter callback. Defaults to `GenerateFacadePhpdoc::defaultFilter()`.
      *
      * @param (callable(ReflectionMethod): bool)|null $filter
      * @return $this
@@ -91,7 +91,7 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * The default filter that excludes methods which name has a '__' prefix.
+     * The default filter that excludes methods which name begins with '__'.
      *
      * @return callable
      */
@@ -103,7 +103,7 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Add a method PHPDoc comment.
+     * Add a line of PHPDoc comment.
      *
      * @param string $doc
      * @return $this
@@ -129,7 +129,7 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Generates the facade PHPDocs.
+     * Generate the PHPDoc comments.
      *
      * @return string
      */
@@ -152,7 +152,7 @@ class GenerateFacadePhpdocs
     }
 
     /**
-     * Generates the facade PHPDocs.
+     * Generate the PHPDoc comments.
      *
      * @return string
      */
@@ -164,13 +164,13 @@ class GenerateFacadePhpdocs
     /**
      * Return methods PHPDocs as an array.
      *
-     * @return array
+     * @return string[]
      */
     public function getMethods(): array
     {
         $docs = [];
-        foreach ($this->reflections as $class => $reflection) {
-            foreach ($reflection->getMethods($this->methodModifiers) as $method) {
+        foreach ($this->reflections as $reflection) {
+            foreach ($reflection->getMethods($this->modifier) as $method) {
                 if ($this->excluded && in_array($method->getName(), $this->excluded)) {
                     continue;
                 }
@@ -201,7 +201,7 @@ class GenerateFacadePhpdocs
                     $value = substr($value, 1);
                 }
                 if (strpos($value, '\\') !== false || class_exists($value)) {
-                    $value = '\\'.$value;
+                    $value = '\\'.ltrim($value, '\\');
                 }
 
                 return $questionMark.$value;

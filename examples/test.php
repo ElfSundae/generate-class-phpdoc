@@ -2,7 +2,7 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Elfsundae\Laravel\GenerateFacadePhpdocs;
+use Elfsundae\Laravel\GenerateFacadePhpdoc;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -47,18 +47,18 @@ class Foo
     }
 }
 
-echo GenerateFacadePhpdocs::for(Foo::class);
+echo GenerateFacadePhpdoc::for(Foo::class);
 
-echo GenerateFacadePhpdocs::for(Foo::class)
+echo GenerateFacadePhpdoc::for(Foo::class)
     ->filter(null);
 
-echo GenerateFacadePhpdocs::for(new Foo)
-    ->exclude('__construct')
-    ->see([Foo::class, GenerateFacadePhpdocs::class]);
+echo GenerateFacadePhpdoc::for(new Foo)
+    ->exclude(['multiParams', 'reference'])
+    ->see([Foo::class, GenerateFacadePhpdoc::class]);
 
-echo GenerateFacadePhpdocs::for(GenerateFacadePhpdocs::class)
+echo GenerateFacadePhpdoc::for(GenerateFacadePhpdoc::class)
     ->filter(null)
-    ->methodModifiers(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED)
+    ->modifier(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED)
     ->add('void addMethod1($param = [])')
     ->add('array addMethod2($a, $b = null)')
     ->generate();

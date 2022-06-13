@@ -1,5 +1,5 @@
 {
-    "name": "elfsundae/laravel-facade-phpdocs-generator",
+    "name": "elfsundae/laravel-facade-phpdoc-generator",
     "description": "Generate PHPDoc comments for Laravel facade classes.",
     "license": "MIT",
     "type": "library",
@@ -9,7 +9,7 @@
             "email": "elf.sundae@gmail.com"
         }
     ],
-    "homepage": "https://github.com/ElfSundae/laravel-facade-phpdocs-generator",
+    "homepage": "https://github.com/ElfSundae/laravel-facade-phpdoc-generator",
     "require": {
         "php": ">=7.1"
     },
