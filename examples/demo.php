@@ -12,3 +12,5 @@ echo GenerateFacadePhpdoc::for([
     \Illuminate\Contracts\Auth\Guard::class,
     \Illuminate\Contracts\Auth\StatefulGuard::class,
 ]);
+
+echo GenerateFacadePhpdoc::for(\Illuminate\Translation\Translator::class);
