@@ -1,0 +1,37 @@
+name: examples
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.1, 7.2, 7.3, 7.4, 8.0, 8.1]
+        stability: [--prefer-stable]
+        include:
+          - php: 7.1
+            stability: --prefer-lowest
+
+    name: PHP ${{ matrix.php }} ${{ matrix.stability }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Install dependencies
+        run: composer update ${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --no-suggest
+
+      - name: Execute test.php
+        run: php examples/test.php
+
+      - name: Execute demo.php
+        run: php examples/demo.php
