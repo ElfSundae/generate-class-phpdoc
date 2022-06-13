@@ -177,7 +177,7 @@ class GenerateFacadePhpdoc
                 if ($this->filter && ! call_user_func($this->filter, $method)) {
                     continue;
                 }
-                $docs[] = $this->getType($method->getReturnType())
+                $docs[] = $this->getType($method->getReturnType(), true)
                     .$method->getName()
                     .$this->getParameters($method);
             }
@@ -188,10 +188,10 @@ class GenerateFacadePhpdoc
         return $docs;
     }
 
-    protected function getType(?ReflectionType $type): string
+    protected function getType(?ReflectionType $type, $isReturnType = false): string
     {
         if (is_null($type)) {
-            return '';
+            return $isReturnType ? 'void ' : '';
         }
 
         $type = (string) $type;

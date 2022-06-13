@@ -41,6 +41,10 @@ class Foo
     {
     }
 
+    public function void($argument): void
+    {
+    }
+
     public function __toString()
     {
         return static::class;
