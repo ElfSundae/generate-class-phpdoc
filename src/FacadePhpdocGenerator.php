@@ -206,7 +206,7 @@ class FacadePhpdocGenerator
      */
     protected function getReturnType($method)
     {
-        $type = $method->getReturnType();
+        $type = method_exists($method, 'getReturnType') ? $method->getReturnType() : null;
 
         if (is_null($type) &&
             ($docComment = $method->getDocComment()) &&
