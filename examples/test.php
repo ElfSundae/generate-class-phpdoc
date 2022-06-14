@@ -41,7 +41,16 @@ class Foo
     {
     }
 
-    public function void($argument): void
+    public function void($argument)
+    {
+    }
+
+    /**
+     * Get return type from doc comment.
+     *
+     * @return string|array|null
+     */
+    public function docComment()
     {
     }
 
