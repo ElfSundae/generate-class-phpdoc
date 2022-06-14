@@ -2,7 +2,7 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Elfsundae\Laravel\GenerateFacadePhpdoc;
+use Elfsundae\Laravel\FacadePhpdocGenerator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -19,7 +19,7 @@ class Foo
         return new Collection();
     }
 
-    public function multiParams($a, callable $b, Collection|Arr|string|array|null $c = 'default'): array
+    public function multiParams($a, callable $b, Collection|Arr|string|array|null $c = 'default'): array|Arr
     {
         return [];
     }
@@ -60,16 +60,16 @@ class Foo
     }
 }
 
-echo GenerateFacadePhpdoc::for(Foo::class);
+echo FacadePhpdocGenerator::make(Foo::class);
 
-echo GenerateFacadePhpdoc::for(Foo::class)
+echo FacadePhpdocGenerator::make(Foo::class)
     ->filter(null);
 
-echo GenerateFacadePhpdoc::for(new Foo)
+echo FacadePhpdocGenerator::make(new Foo)
     ->exclude(['multiParams', 'reference'])
-    ->see([Foo::class, GenerateFacadePhpdoc::class]);
+    ->see([Foo::class, FacadePhpdocGenerator::class]);
 
-echo GenerateFacadePhpdoc::for(GenerateFacadePhpdoc::class)
+echo FacadePhpdocGenerator::make(FacadePhpdocGenerator::class)
     ->filter(null)
     ->modifier(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED)
     ->add('void addMethod1($param = [])')

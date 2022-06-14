@@ -2,18 +2,18 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Elfsundae\Laravel\GenerateFacadePhpdoc;
+use Elfsundae\Laravel\FacadePhpdocGenerator;
 
-echo GenerateFacadePhpdoc::for(\Illuminate\Log\LogManager::class);
+echo FacadePhpdocGenerator::make(\Illuminate\Log\LogManager::class);
 
-echo GenerateFacadePhpdoc::for([
+echo FacadePhpdocGenerator::make([
     \Illuminate\Log\LogManager::class,
     \Illuminate\Log\Logger::class,
 ]);
 
-echo GenerateFacadePhpdoc::for(\Illuminate\Translation\Translator::class);
+echo FacadePhpdocGenerator::make(\Illuminate\Translation\Translator::class);
 
-echo GenerateFacadePhpdoc::for([
+echo FacadePhpdocGenerator::make([
     \Illuminate\Auth\AuthManager::class,
     \Illuminate\Contracts\Auth\Factory::class,
     \Illuminate\Contracts\Auth\Guard::class,

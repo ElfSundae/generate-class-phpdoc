@@ -7,7 +7,7 @@ use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionType;
 
-class GenerateFacadePhpdoc
+class FacadePhpdocGenerator
 {
     protected $reflections = [];
 
@@ -45,7 +45,7 @@ class GenerateFacadePhpdoc
      *
      * @throws \ReflectionException
      */
-    public static function for(string|object|array $classes): static
+    public static function make(string|object|array $classes): static
     {
         return new static($classes);
     }
@@ -78,7 +78,7 @@ class GenerateFacadePhpdoc
     }
 
     /**
-     * Set the method filter callback. Defaults to `GenerateFacadePhpdoc::defaultFilter()`.
+     * Set the method filter callback. Defaults to `FacadePhpdocGenerator::defaultFilter()`.
      *
      * @param (callable(ReflectionMethod): bool)|null $filter
      * @return $this

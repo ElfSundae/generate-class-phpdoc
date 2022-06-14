@@ -32,6 +32,7 @@ jobs:
 
       - name: Execute test.php
         run: php examples/test.php
+        if: matrix.php >= 8
 
       - name: Execute demo.php
         run: php examples/demo.php
