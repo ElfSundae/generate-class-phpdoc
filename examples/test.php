@@ -19,7 +19,7 @@ class Foo
         return new Collection();
     }
 
-    public function multiParams($a, callable $b, Collection|Arr|string|array|null $c = 'default'): array|Arr
+    public function multiParams($a, callable $b, Collection|Arr|string|array|null $c = 'default'): array
     {
         return [];
     }
