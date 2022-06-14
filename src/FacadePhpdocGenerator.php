@@ -346,7 +346,7 @@ class FacadePhpdocGenerator
     protected function getParameterName($parameter)
     {
         $name = '$'.$parameter->getName();
-        if ($parameter->isVariadic()) {
+        if (method_exists($parameter, 'isVariadic') && $parameter->isVariadic()) {
             $name = '...'.$name;
         }
         if ($parameter->isPassedByReference()) {
