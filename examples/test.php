@@ -65,6 +65,8 @@ echo FacadePhpdocGenerator::make(Foo::class);
 echo FacadePhpdocGenerator::make(Foo::class)
     ->filter(null);
 
+echo FacadePhpdocGenerator::make(Foo::class, FacadePhpdocGenerator::class);
+
 echo FacadePhpdocGenerator::make(new Foo)
     ->exclude(['multiParams', 'reference'])
     ->see([Foo::class, FacadePhpdocGenerator::class]);

@@ -2,10 +2,9 @@
 
 namespace Elfsundae\Laravel;
 
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionParameter;
-use ReflectionType;
 
 class FacadePhpdocGenerator
 {
@@ -24,11 +23,9 @@ class FacadePhpdocGenerator
      *
      * @throws \ReflectionException
      */
-    public function __construct(string|object|array $classes)
+    public function __construct($classes)
     {
-        if (! is_array($classes)) {
-            $classes = [$classes];
-        }
+        $classes = is_array($classes) ? $classes : func_get_args();
         foreach ($classes as $class) {
             $reflection = new ReflectionClass($class);
             $this->reflections[$reflection->getName()] = $reflection;
@@ -45,9 +42,9 @@ class FacadePhpdocGenerator
      *
      * @throws \ReflectionException
      */
-    public static function make(string|object|array $classes): static
+    public static function make($classes)
     {
-        return new static($classes);
+        return new static(is_array($classes) ? $classes : func_get_args());
     }
 
     /**
@@ -56,9 +53,15 @@ class FacadePhpdocGenerator
      *
      * @param int $modifier Bitwise of ReflectionMethod modifiers.
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function modifier(int $modifier): static
+    public function modifier($modifier)
     {
+        if (! is_int($modifier)) {
+            throw new InvalidArgumentException('$modifier should be int');
+        }
+
         $this->modifier = $modifier;
 
         return $this;
@@ -70,9 +73,10 @@ class FacadePhpdocGenerator
      * @param string|array $names
      * @return $this
      */
-    public function exclude(string|array $names): static
+    public function exclude($names)
     {
-        $this->excluded = array_merge($this->excluded, (array) $names);
+        $names = is_array($names) ? $names : func_get_args();
+        $this->excluded = array_merge($this->excluded, $names);
 
         return $this;
     }
@@ -82,9 +86,15 @@ class FacadePhpdocGenerator
      *
      * @param (callable(ReflectionMethod): bool)|null $filter
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function filter(?callable $filter): static
+    public function filter($filter)
     {
+        if (! is_callable($filter) && ! is_null($filter)) {
+            throw new InvalidArgumentException('$filter should be callable');
+        }
+
         $this->filter = $filter;
 
         return $this;
@@ -95,9 +105,9 @@ class FacadePhpdocGenerator
      *
      * @return callable
      */
-    public static function defaultFilter(): callable
+    public static function defaultFilter()
     {
-        return static function (ReflectionMethod $method) {
+        return static function ($method) {
             return strpos($method->getName(), '__') !== 0;
         };
     }
@@ -108,7 +118,7 @@ class FacadePhpdocGenerator
      * @param string $doc
      * @return $this
      */
-    public function add(string $doc): static
+    public function add($doc)
     {
         $this->add[] = $doc;
 
@@ -121,9 +131,9 @@ class FacadePhpdocGenerator
      * @param string|array $classes
      * @return $this
      */
-    public function see(string|array $classes): static
+    public function see($classes)
     {
-        $this->see = (array) $classes;
+        $this->see = is_array($classes) ? $classes : func_get_args();
 
         return $this;
     }
@@ -133,7 +143,7 @@ class FacadePhpdocGenerator
      *
      * @return string
      */
-    public function generate(): string
+    public function generate()
     {
         $doc = '/**'.PHP_EOL;
 
@@ -156,7 +166,7 @@ class FacadePhpdocGenerator
      *
      * @return string
      */
-    public function __toString(): string
+    public function __toString()
     {
         return $this->generate();
     }
@@ -164,9 +174,9 @@ class FacadePhpdocGenerator
     /**
      * Return methods PHPDocs as an array.
      *
-     * @return string[]
+     * @return array
      */
-    public function getMethods(): array
+    public function getMethods()
     {
         $docs = [];
         foreach ($this->reflections as $reflection) {
@@ -188,7 +198,13 @@ class FacadePhpdocGenerator
         return $docs;
     }
 
-    protected function getReturnType(ReflectionMethod $method): string
+    /**
+     * Get the method's return type.
+     *
+     * @param ReflectionMethod $method
+     * @return string
+     */
+    protected function getReturnType($method)
     {
         $type = $method->getReturnType();
 
@@ -208,7 +224,13 @@ class FacadePhpdocGenerator
         return $this->processType($type);
     }
 
-    protected function processType(ReflectionType|string|null $type): string
+    /**
+     * Process the type.
+     *
+     * @param \ReflectionType|string|null $type
+     * @return string
+     */
+    protected function processType($type)
     {
         if (! $type) {
             return '';
@@ -231,9 +253,15 @@ class FacadePhpdocGenerator
         return $type ? $type.' ' : '';
     }
 
-    protected function getParameters(ReflectionMethod $method): string
+    /**
+     * Get method's parameters.
+     *
+     * @param \ReflectionMethod $method
+     * @return string
+     */
+    protected function getParameters($method)
     {
-        $parameters = array_map(function (ReflectionParameter $parameter) use ($method) {
+        $parameters = array_map(function ($parameter) use ($method) {
             return $this->getParameterType($parameter)
                 .$this->getParameterName($parameter)
                 .$this->getParameterDefaultValue($method, $parameter);
@@ -242,12 +270,24 @@ class FacadePhpdocGenerator
         return '('.implode(', ', $parameters).')';
     }
 
-    protected function getParameterType(ReflectionParameter $parameter): string
+    /**
+     * Get parameter's type.
+     *
+     * @param \ReflectionParameter $parameter
+     * @return string
+     */
+    protected function getParameterType($parameter)
     {
         return $this->processType($parameter->getType());
     }
 
-    protected function getParameterName(ReflectionParameter $parameter): string
+    /**
+     * Get parameter's name.
+     *
+     * @param \ReflectionParameter $parameter
+     * @return string
+     */
+    protected function getParameterName($parameter)
     {
         $name = '$'.$parameter->getName();
         if ($parameter->isVariadic()) {
@@ -260,7 +300,14 @@ class FacadePhpdocGenerator
         return $name;
     }
 
-    protected function getParameterDefaultValue(ReflectionMethod $method, ReflectionParameter $parameter): string
+    /**
+     * Get parameter's default value.
+     *
+     * @param \ReflectionMethod $method
+     * @param \ReflectionParameter $parameter
+     * @return string
+     */
+    protected function getParameterDefaultValue($method, $parameter)
     {
         if (! $parameter->isDefaultValueAvailable()) {
             return '';
