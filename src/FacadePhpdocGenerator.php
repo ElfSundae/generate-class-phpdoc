@@ -124,7 +124,7 @@ class FacadePhpdocGenerator
     {
         $doc = is_array($doc) ? array_values($doc) : [$doc];
         $key = $position.'_'.$name;
-        $this->add[$key] = array_merge($this->add[$key] ?? [], $doc);
+        $this->add[$key] = ! isset($this->add[$key]) ? $doc : array_merge($this->add[$key], $doc);
 
         return $this;
     }
@@ -220,12 +220,19 @@ class FacadePhpdocGenerator
                 if ($this->filter && ! call_user_func($this->filter, $method)) {
                     continue;
                 }
-                $docs = array_merge($docs, $this->add['before_'.$name] ?? []);
+
+                if (isset($this->add['before_'.$name])) {
+                    $docs = array_merge($docs, $this->add['before_'.$name]);
+                }
                 $docs[] = $this->getReturnType($method).$name.$this->getParameters($method);
-                $docs = array_merge($docs, $this->add['after_'.$name] ?? []);
+                if (isset($this->add['after_'.$name])) {
+                    $docs = array_merge($docs, $this->add['after_'.$name]);
+                }
             }
         }
-        $docs = array_merge($docs, $this->add['_'] ?? []);
+        if (isset($this->add['_'])) {
+            $docs = array_merge($docs, $this->add['_']);
+        }
         $docs = array_values(array_unique($docs));
 
         return $docs;
