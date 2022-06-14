@@ -316,7 +316,7 @@ class FacadePhpdocGenerator
 
         if (is_null($type) &&
             ($docComment = $method->getDocComment()) &&
-            preg_match('#^\s*\*\s+@param\s+(.+)\s+[&.]*\$'.$parameter->getName().'#m', $docComment, $matches)
+            preg_match('#^\s*\*\s+@param\s+(.+?)\s+[&.]*\$'.$parameter->getName().'#m', $docComment, $matches)
         ) {
             $type = $matches[1];
             if ($type == 'mixed') {
