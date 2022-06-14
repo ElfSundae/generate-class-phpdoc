@@ -113,16 +113,44 @@ class FacadePhpdocGenerator
     }
 
     /**
-     * Add a line of PHPDoc comment.
+     * Add method PHPDoc comments.
      *
-     * @param string $doc
+     * @param string|array $doc
+     * @param string $position
+     * @param string $name
      * @return $this
      */
-    public function add($doc)
+    public function add($doc, $position = '', $name = '')
     {
-        $this->add[] = $doc;
+        $doc = is_array($doc) ? array_values($doc) : [$doc];
+        $key = $position.'_'.$name;
+        $this->add[$key] = array_merge($this->add[$key] ?? [], $doc);
 
         return $this;
+    }
+
+    /**
+     * Add method PHPDoc comments before the given method name.
+     *
+     * @param string|array $doc
+     * @param string $name
+     * @return $this
+     */
+    public function addBefore($doc, $name)
+    {
+        return $this->add($doc, 'before', $name);
+    }
+
+    /**
+     * Add method PHPDoc comments after the given method name.
+     *
+     * @param string|array $doc
+     * @param string $name
+     * @return $this
+     */
+    public function addAfter($doc, $name)
+    {
+        return $this->add($doc, 'after', $name);
     }
 
     /**
@@ -179,20 +207,25 @@ class FacadePhpdocGenerator
     public function getMethods()
     {
         $docs = [];
+        $gotNames = [];
         foreach ($this->reflections as $reflection) {
             foreach ($reflection->getMethods($this->modifier) as $method) {
-                if ($this->excluded && in_array($method->getName(), $this->excluded)) {
+                $name = $method->getName();
+                if (in_array($name, $gotNames)) {
+                    continue;
+                }
+                if ($this->excluded && in_array($name, $this->excluded)) {
                     continue;
                 }
                 if ($this->filter && ! call_user_func($this->filter, $method)) {
                     continue;
                 }
-                $docs[] = $this->getReturnType($method)
-                    .$method->getName()
-                    .$this->getParameters($method);
+                $docs = array_merge($docs, $this->add['before_'.$name] ?? []);
+                $docs[] = $this->getReturnType($method).$name.$this->getParameters($method);
+                $docs = array_merge($docs, $this->add['after_'.$name] ?? []);
             }
         }
-        $docs = array_merge($docs, $this->add);
+        $docs = array_merge($docs, $this->add['_'] ?? []);
         $docs = array_values(array_unique($docs));
 
         return $docs;

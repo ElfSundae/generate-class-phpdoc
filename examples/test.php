@@ -75,5 +75,7 @@ echo FacadePhpdocGenerator::make(FacadePhpdocGenerator::class)
     ->filter(null)
     ->modifier(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED)
     ->add('void addMethod1($param = [])')
-    ->add('array addMethod2($a, $b = null)')
+    ->add(['array addMethod2($a, $b = null)', 'void addMethod3()'])
+    ->addBefore('string addBefore()', 'generate')
+    ->addAfter('addAfter()', 'generate')
     ->generate();
