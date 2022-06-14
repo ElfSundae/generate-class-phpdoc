@@ -239,7 +239,7 @@ class FacadePhpdocGenerator
      */
     protected function getReturnType($method)
     {
-        $type = $method->getReturnType();
+        $type = method_exists($method, 'getReturnType') ? $method->getReturnType() : null;
 
         if (is_null($type) &&
             ($docComment = $method->getDocComment()) &&
@@ -295,7 +295,7 @@ class FacadePhpdocGenerator
     protected function getParameters($method)
     {
         $parameters = array_map(function ($parameter) use ($method) {
-            return $this->getParameterType($parameter)
+            return $this->getParameterType($method, $parameter)
                 .$this->getParameterName($parameter)
                 .$this->getParameterDefaultValue($method, $parameter);
         }, $method->getParameters());
@@ -306,12 +306,28 @@ class FacadePhpdocGenerator
     /**
      * Get parameter's type.
      *
+     * @param \ReflectionMethod $method
      * @param \ReflectionParameter $parameter
      * @return string
      */
-    protected function getParameterType($parameter)
+    protected function getParameterType($method, $parameter)
     {
-        return $this->processType($parameter->getType());
+        $type = method_exists($parameter, 'getType') ? $parameter->getType() : null;
+
+        if (is_null($type) &&
+            ($docComment = $method->getDocComment()) &&
+            preg_match('#^\s*\*\s+@param\s+(.+)\s+[&.]*\$'.$parameter->getName().'#m', $docComment, $matches)
+        ) {
+            $type = $matches[1];
+            if ($type == 'mixed') {
+                $type = '';
+            }
+        }
+        if ($type == 'static') {
+            $type = $method->class;
+        }
+
+        return $this->processType($type);
     }
 
     /**

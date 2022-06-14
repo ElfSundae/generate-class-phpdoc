@@ -37,10 +37,20 @@ class Foo
     {
     }
 
+    /**
+     * @param int &...$numbers
+     * @return mixed
+     */
     public function variadic(&...$numbers)
     {
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param  mixed  $argument
+     * @return void
+     */
     public function void($argument)
     {
     }
