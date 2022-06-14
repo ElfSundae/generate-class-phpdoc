@@ -236,7 +236,7 @@ class FacadePhpdocGenerator
             return '';
         }
 
-        $type = (string) $type;
+        $type = @strval($type);
         if ($types = explode('|', $type)) {
             $type = implode('|', array_map(function ($value) {
                 if ($questionMark = substr($value, 0, 1) === '?' ? '?' : '') {
