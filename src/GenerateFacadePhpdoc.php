@@ -192,12 +192,25 @@ class GenerateFacadePhpdoc
     {
         $type = $method->getReturnType();
 
+        if (is_null($type) &&
+            ($docComment = $method->getDocComment()) &&
+            preg_match('#^\s*\*\s+@return\s+([^\s]+)#m', $docComment, $matches)
+        ) {
+            $type = $matches[1];
+            if ($type == '$this') {
+                $type = $method->class;
+            }
+        }
+        if ($type == 'static') {
+            $type = $method->class;
+        }
+
         return $this->processType($type);
     }
 
-    protected function processType(?ReflectionType $type): string
+    protected function processType(ReflectionType|string|null $type): string
     {
-        if (is_null($type)) {
+        if (! $type) {
             return '';
         }
 
