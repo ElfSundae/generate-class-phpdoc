@@ -230,12 +230,12 @@ class FacadePhpdocGenerator
                 }
             }
         }
+
         if (isset($this->add['_'])) {
             $docs = array_merge($docs, $this->add['_']);
         }
-        $docs = array_values(array_unique($docs));
 
-        return $docs;
+        return array_values(array_unique($docs));
     }
 
     /**
