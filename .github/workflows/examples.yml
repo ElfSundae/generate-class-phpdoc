@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: composer update ${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --no-suggest
 
-      - name: Execute test.php
+      - name: Execute test.php, push.php
         run: |
           php examples/test.php
           php examples/push.php
