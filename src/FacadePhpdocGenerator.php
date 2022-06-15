@@ -2,6 +2,7 @@
 
 namespace Elfsundae\Laravel;
 
+use ErrorException;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
@@ -384,5 +385,36 @@ class FacadePhpdocGenerator
         }
 
         return ' = '.$export;
+    }
+
+    /**
+     * Update the facade class file with the generated PHPDoc comments.
+     *
+     * @param string $class
+     * @param string|null $file
+     * @return bool
+     *
+     * @throws \ReflectionException
+     * @throws \ErrorException
+     */
+    public function updateFacade($class, $file = null)
+    {
+        $reflection = new ReflectionClass($class);
+        if (! $file) {
+            $file = $reflection->getFileName();
+        }
+
+        $content = @file_get_contents($file);
+        if ($content === false) {
+            throw new ErrorException("Failed to read file at path {$file}");
+        }
+
+        $doc = $this->generate();
+        $content = preg_replace('#(?:/\*\*[\s\S]*)?(class '.$reflection->getShortName().')#', $doc.'$1', $content, 1, $count);
+        if ($count !== 1) {
+            return false;
+        }
+
+        return (bool) file_put_contents($file, $content);
     }
 }
